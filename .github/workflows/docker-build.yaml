@@ -1,0 +1,53 @@
+name: docker
+
+on:
+  pull_request:
+
+jobs:
+  frontend:
+    name: frontend docker build & push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          path: .
+
+      - name: BuildImage
+        uses: docker/build-push-action@v6
+        with:
+          context: ./dev/frontend
+          file: ./dev/frontend/Dockerfile
+          outputs: type=tar,dest=frontend-docker-image.tar
+          push: false
+          tags: "frontend-docker-image"
+
+      - name: UploadArtifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-docker-build-output
+          path: ./frontend-docker-image.tar
+
+  backend:
+    name: backend docker build & push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          path: .
+
+      - name: BuildImage
+        uses: docker/build-push-action@v6
+        with:
+          context: ./dev/backend
+          file: ./dev/backend/Dockerfile
+          outputs: type=tar,dest=backend-docker-image.tar
+          push: false
+          tags: "backend-docker-image"
+
+      - name: UploadArtifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-docker-build-output
+          path: ./backend-docker-image.tar
